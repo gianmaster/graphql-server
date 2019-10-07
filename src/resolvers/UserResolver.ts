@@ -16,6 +16,7 @@ import { isAuth } from "../isAuth";
 import { sendRefreshToken } from "../sendRefreshToken";
 import { getConnection } from "typeorm";
 import { verify } from "jsonwebtoken";
+import { Company } from "../entities/Company";
 
 @ObjectType()
 class LoginResponse {
@@ -41,7 +42,7 @@ export class UserResolver {
 
   @Query(() => [User])
   users() {
-    return User.find();
+    return User.find({ relations: ['company']});
   }
 
   @Query(() => User, { nullable: true })
@@ -108,21 +109,29 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  async register(
+  async userRegister(
     @Arg('firstname') firstName: string,
     @Arg('lastname') lastName: string,
     @Arg('username') username: string,
     @Arg("email") email: string,
-    @Arg("password") password: string
+    @Arg("password") password: string,
+    @Arg('companyId') companyId: string
   ) {
     const hashedPassword = await hash(password, 12);
 
     try {
+      const company = await Company.findOne({id: companyId});
+
+      if (!company) {
+        throw `Company not found: ${companyId}`;
+      }
+
       await User.insert({
         firstName,
         lastName,
         username,
         email,
+        company,
         password: hashedPassword
       });
     } catch (err) {

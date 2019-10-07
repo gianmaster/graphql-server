@@ -1,14 +1,14 @@
-import { PrimaryGeneratedColumn, BaseEntity, UpdateDateColumn } from "typeorm";
-import { Field, Int, ObjectType } from 'type-graphql';
+import { PrimaryGeneratedColumn, BaseEntity, UpdateDateColumn, CreateDateColumn } from "typeorm";
+import { Field, ObjectType } from 'type-graphql';
 
 @ObjectType()
 export class Base extends BaseEntity {
-  @Field(() => Int)
+  @Field()
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Field()
-  @UpdateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn({ type: 'timestamp' })
   createdAt: number;
   
   @Field()
@@ -16,6 +16,5 @@ export class Base extends BaseEntity {
   updatedAt: number;
 
   @Field()
-  @UpdateDateColumn({ type: 'timestamp' })
   deletedAt: number;
 }
